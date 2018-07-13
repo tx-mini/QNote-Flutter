@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -136,7 +137,9 @@ class PageWidgetState extends State<PageWidget> {
                             ),
                           ),
                           onTap: () {
-                            Navigator.pop(context);
+                            setState(() {
+                              _editing = false;
+                            });
                           },
                         ),
                         new Container(
@@ -172,7 +175,9 @@ class PageWidgetState extends State<PageWidget> {
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    setState(() {
+                      _editing = false;
+                    });
                   },
                 ),
               ],
@@ -208,17 +213,29 @@ class PageWidgetState extends State<PageWidget> {
             return _getEditContentItem(position);
           });
     }
-    return new Scaffold(
-      body: new Column(
-        children: <Widget>[
-          titleWidget,
-          new Divider(
-            height: 0.0,
+    return new WillPopScope(
+        child: new Scaffold(
+          body: new Column(
+            children: <Widget>[
+              titleWidget,
+              new Divider(
+                height: 0.0,
+              ),
+              new Flexible(child: contentListWidget),
+            ],
           ),
-          new Flexible(child: contentListWidget),
-        ],
-      ),
-    );
+        ),
+        onWillPop: _onWillPop);
+  }
+
+  Future<bool> _onWillPop() {
+    bool canBack = !_editing;
+    if (_editing) {
+      setState(() {
+        _editing = false;
+      });
+    }
+    return new Future.value(canBack);
   }
 
   Widget _getContentItem(int position) {
@@ -250,6 +267,7 @@ class PageWidgetState extends State<PageWidget> {
     for (int i = 0; i < noteContent.blocks.length; i++) {
       BlockObject item = noteContent.blocks[i];
       NoteContentSimpleData noteContentSimpleData = new NoteContentSimpleData();
+      noteContentSimpleData.isSelect = false;
       if (item.entityRanges.length > 0) {
         noteContentSimpleData.type = Const.CONTENT_TYPE_IMG;
         noteContentSimpleData.content = noteContent.entityMap["0"].data.url;
@@ -273,20 +291,52 @@ class PageWidgetState extends State<PageWidget> {
     }
 
     List<String> longPressSelection = ["复制", "编辑"];
-    return new InkWell(
-      child: new Container(
-        padding: new EdgeInsets.only(left: 42.0, right: 42.0),
-        child: new SizedBox(
-          height: 100.0,
-          child: child,
-        ),
-      ),
-      onLongPress: () {
-        setState(() {
-          _editing = true;
-        });
+
+    Widget contentWidget = new Card(
+        margin:
+            new EdgeInsets.only(left: 10.0, right: 42.0, top: 5.0, bottom: 5.0),
+        child: new InkWell(
+          child: new Container(
+            padding: new EdgeInsets.all(5.0),
+            child: new SizedBox(
+              height: 100.0,
+              width: 320.0,
+              child: child,
+            ),
+          ),
+          onLongPress: () {
+//            setState(() {
+//              _editing = true;
+//            });
 //          BaseUtil.showChooseDialog()
-      },
+          },
+          onTap: () {
+            _contentData[position].isSelect = !_contentData[position].isSelect;
+            setState(() {
+              _editing = true;
+            });
+          },
+        ));
+    Widget itemSelectWidget;
+    if (_contentData[position].isSelect) {
+      itemSelectWidget = new Image.asset("img/ic_choose_high_light.png");
+    } else {
+      itemSelectWidget = new Image.asset("img/ic_choose.png");
+    }
+    return new Row(
+      children: <Widget>[
+        new Container(
+          margin: new EdgeInsets.only(left: 10.0),
+          child: new SizedBox(
+            width: 20.0,
+            height: 20.0,
+            child: itemSelectWidget,
+          ),
+        ),
+        new Flexible(
+          child: contentWidget,
+        ),
+      ],
     );
   }
 }

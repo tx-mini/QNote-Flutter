@@ -41,5 +41,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>QNote请求使用你的相机</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>QNote请求使用你的麦克风</string>
 </dict>
 </plist>

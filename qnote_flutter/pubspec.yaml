@@ -10,6 +10,10 @@ dependencies:
   cupertino_icons: ^0.1.2
   intl: "^0.15.6"
   json_annotation: ^0.2.2
+  camera: "^0.2.1"
+  image_picker: "^0.4.5"
+  path_provider: 0.3.0
+  video_player: "0.5.2"
 
 dev_dependencies:
   flutter_test:
@@ -38,3 +42,5 @@ flutter:
       - img/ic_setting.png
       - img/ic_study.png
       - img/ic_sure_gray.png
+      - img/ic_choose.png
+      - img/ic_choose_high_light.png
